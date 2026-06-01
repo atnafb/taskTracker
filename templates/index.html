@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>App Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">DynamoDB task workspace</p>
+          <h1>App Tracker</h1>
+          <p class="lede">Add, update, complete, and remove tasks from a fast EC2-hosted web app.</p>
+        </div>
+        <div class="stats" aria-label="Task summary">
+          <span>{{ tasks|length }}</span>
+          <small>visible tasks</small>
+        </div>
+      </section>
+
+      <section class="composer" aria-label="Add a task">
+        <form action="{{ url_for('add_task') }}" method="post">
+          <div class="field">
+            <label for="title">Task</label>
+            <input id="title" name="title" placeholder="Launch app server" required>
+          </div>
+          <div class="field">
+            <label for="description">Notes</label>
+            <input id="description" name="description" placeholder="What needs to happen?">
+          </div>
+          <div class="field priority-field">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+              <option>High</option>
+              <option selected>Normal</option>
+              <option>Low</option>
+            </select>
+          </div>
+          <button type="submit">Add Task</button>
+        </form>
+      </section>
+
+      <nav class="filters" aria-label="Task filters">
+        <a class="{{ 'active' if status_filter == 'all' else '' }}" href="{{ url_for('index', status='all') }}">All</a>
+        <a class="{{ 'active' if status_filter == 'open' else '' }}" href="{{ url_for('index', status='open') }}">Open</a>
+        <a class="{{ 'active' if status_filter == 'done' else '' }}" href="{{ url_for('index', status='done') }}">Done</a>
+      </nav>
+
+      <section class="task-list" aria-label="Task list">
+        {% if tasks %}
+          {% for task in tasks %}
+            <article class="task {{ 'complete' if task.completed else '' }}">
+              <form class="task-edit" action="{{ url_for('edit_task', task_id=task.task_id) }}" method="post">
+                <input name="title" value="{{ task.title }}" aria-label="Task title" required>
+                <input name="description" value="{{ task.description }}" aria-label="Task description">
+                <select name="priority" aria-label="Priority">
+                  {% for option in ['High', 'Normal', 'Low'] %}
+                    <option {{ 'selected' if task.priority == option else '' }}>{{ option }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit">Update</button>
+              </form>
+              <div class="task-actions">
+                <form action="{{ url_for('toggle_task', task_id=task.task_id) }}" method="post">
+                  <input type="hidden" name="completed" value="{{ 'false' if task.completed else 'true' }}">
+                  <button class="secondary" type="submit">{{ 'Reopen' if task.completed else 'Done' }}</button>
+                </form>
+                <form action="{{ url_for('delete_task', task_id=task.task_id) }}" method="post">
+                  <button class="danger" type="submit">Delete</button>
+                </form>
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          <div class="empty">
+            <h2>No tasks yet</h2>
+            <p>Create your first task above and it will be saved in DynamoDB.</p>
+          </div>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

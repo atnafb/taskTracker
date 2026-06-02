@@ -36,7 +36,7 @@ export KEY_NAME=your-existing-ec2-keypair
 export GIT_REPO_URL=https://github.com/YOUR_GITHUB_USER/app-tracker.git
 ./scripts/deploy.sh
 ```
-![AWS Architecture](docs/images/task-tracker-home.jpg)
+![AWS Architecture](docs/images/aws-architecture.png)
 Optional settings:
 
 ```bash

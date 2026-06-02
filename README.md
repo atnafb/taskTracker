@@ -55,6 +55,9 @@ The script creates or reuses:
 - Security group allowing HTTP and SSH
 - Amazon Linux 2023 EC2 instance
 - Nginx reverse proxy to Gunicorn
+### DynamoDB Table Items
+
+![DynamoDB table items](docs/images/DynamoDB-Items.jpg)
 
 ## Cleanup
 

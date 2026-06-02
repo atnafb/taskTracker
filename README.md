@@ -9,7 +9,9 @@ A small Flask task tracker designed for EC2 in a default VPC with DynamoDB stora
 - Mark tasks done or reopen them
 - Delete tasks
 - Store task data in DynamoDB
+## App Screenshot
 
+![App Tracker home page](docs/images/task-tracker-home.jpg)
 ## Local Run
 
 You need AWS credentials that can access the DynamoDB table.

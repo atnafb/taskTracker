@@ -1,4 +1,4 @@
-# App Tracker
+# Task Tracker
 
 A small Flask task tracker designed for EC2 in a default VPC with DynamoDB storage.
 

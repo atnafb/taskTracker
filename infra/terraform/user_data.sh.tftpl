@@ -1,0 +1,52 @@
+#!/bin/bash
+set -euxo pipefail
+
+dnf update -y
+dnf install -y git python3 python3-pip nginx
+
+mkdir -p /opt/${app_name}
+git clone --branch ${git_branch} ${git_repo_url} /opt/${app_name}
+cd /opt/${app_name}
+
+python3 -m venv .venv
+. .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+
+cat >/etc/systemd/system/${app_name}.service <<SERVICE
+[Unit]
+Description=${app_name} Flask app
+After=network.target
+
+[Service]
+User=ec2-user
+WorkingDirectory=/opt/${app_name}
+Environment=AWS_REGION=${aws_region}
+Environment=TASKS_TABLE=${table_name}
+ExecStart=/opt/${app_name}/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+cat >/etc/nginx/conf.d/${app_name}.conf <<NGINX
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+NGINX
+
+chown -R ec2-user:ec2-user /opt/${app_name}
+systemctl daemon-reload
+systemctl enable --now ${app_name}
+systemctl enable --now nginx

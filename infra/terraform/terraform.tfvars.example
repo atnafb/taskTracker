@@ -1,0 +1,18 @@
+aws_region   = "us-west-2"
+project_name = "app-tracker"
+table_name   = "AppTrackerTasks"
+instance_type = "t3.micro"
+
+# Use an existing EC2 key pair name, without .pem.
+key_name = "app-tracker-key"
+
+# Replace with your public IP plus /32.
+ssh_cidr = "YOUR_PUBLIC_IP/32"
+
+git_repo_url = "https://github.com/atnafb/taskTracker.git"
+git_branch   = "main"
+
+# In a normal AWS account, keep this true.
+# In restricted lab accounts that block IAM creation, set false and provide an existing profile if available.
+create_instance_profile       = true
+existing_instance_profile_name = ""
